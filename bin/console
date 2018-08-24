@@ -13,5 +13,12 @@ ActiveRecord::Migration.verbose = false
 notifiable_rails_path = Gem.loaded_specs['notifiable-rails'].full_gem_path
 ActiveRecord::MigrationContext.new(File.join(notifiable_rails_path, 'db', 'migrate')).migrate
 
+@app = Notifiable::App.create name: 'Test'
+@notification = Notifiable::Notification.new title: 'test', message: 'test', app: @app
+@device = Notifiable::DeviceToken.new token: '8505d004f11feb81afb3fa6dec353be988119d47b157b662313acb70c4b97926', app: @app
+@sender = Notifiable::Apns::Apnotic::Async.new({}, @notification)
+@sender.certificate = '/Users/mattbrooke-smith/Development/notifiable-apns-apnotic/tmp/key.pem'
+@sender.bundle_id = 'com.futureworkshops.notifiable.Sample'
+
 require "irb"
 IRB.start(__FILE__)

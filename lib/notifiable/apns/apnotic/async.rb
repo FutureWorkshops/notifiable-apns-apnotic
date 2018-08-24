@@ -6,9 +6,9 @@ module Notifiable
     module Apnotic
   		class Async < Notifiable::NotifierBase
         
-        notifier_attribute :certificate, :passphrase, :sandbox
+        notifier_attribute :certificate, :bundle_id, :passphrase, :sandbox
         
-        attr_reader :certificate, :passphrase
+        attr_reader :certificate, :passphrase, :bundle_id
         
         def sandbox?
           @sandbox == "1"
@@ -16,17 +16,23 @@ module Notifiable
       
   			protected      
   			def enqueue(device, notification)        				
-          raise "Certificate missing" if certificate.nil?
+          raise "certificate missing" if certificate.nil?
+          raise "bundle_id missing" if bundle_id.nil?
           
-          connection = Apnotic::Connection.new(cert_path: certificate, cert_pass: passphrase, url: url)
+          connection = ::Apnotic::Connection.new(cert_path: certificate, cert_pass: passphrase, url: url)
           
-          notification = notification(device, notification)
+          apnotic_notification = build_notification(device, notification)
         
-          push = connection.prepare_push(notification)
+          push = connection.prepare_push(apnotic_notification)
           push.on(:response) do |response|
-            response.ok? ? processed(device, 0) : processed(device, response.status)
-            
-            device.destroy if response.status == '410' || (response.status == '400' && response.body['reason'] == 'BadDeviceToken')
+            if response.ok?
+              processed(device, 0)
+            elsif response.status == '410' || (response.status == '400' && response.body['reason'] == 'BadDeviceToken')
+              device.destroy
+              processed(device, response.status)
+            else
+              processed(device, response.status)
+            end
           end
 
           connection.push_async(push)
@@ -41,14 +47,14 @@ module Notifiable
 
         private 
         def url
-          self.sandbox? ? Apnotic::APPLE_DEVELOPMENT_SERVER_URL : Apnotic::APPLE_PRODUCTION_SERVER_URL
+          self.sandbox? ? ::Apnotic::APPLE_DEVELOPMENT_SERVER_URL : ::Apnotic::APPLE_PRODUCTION_SERVER_URL
         end
         
         attr_accessor :alert, :badge, :sound, :content_available, :category, :custom_payload, :url_args, :mutable_content, :thread_id
         
           
-        def notification(device, notification)
-          payload = Apnotic::Notification.new(device.device_token)
+        def build_notification(device, notification)
+          payload = ::Apnotic::Notification.new(device.token)
           payload.alert = {}
           payload.alert[:title] = notification.title if notification.title
           payload.alert[:body] = notification.message if notification.message
@@ -57,13 +63,13 @@ module Notifiable
           payload.content_available = notification.content_available if notification.content_available
           payload.badge = notification.badge_count if notification.badge_count          
           payload.custom_payload = notification.send_params
-          payload = {device_token: device.token, custom: , alert: {}}
           payload.thread_id = notification.thread_id if notification.thread_id
           payload.mutable_content = notification.mutable_content if notification.mutable_content 
           payload.category = notification.category if notification.category
-                   
-          #payload[:identifier] = notification.identifier if notification.identifier
-          #payload[:expiry] = notification.expiry if notification.expiry
+          payload.topic = bundle_id
+          payload.expiration = 0 || notification.expiry.to_f
+          payload.identifier = notification.identifier if notification.identifier
+          
           payload
         end
   		end

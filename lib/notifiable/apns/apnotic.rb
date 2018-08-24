@@ -1,9 +1,9 @@
 require "notifiable/apns/apnotic/version"
+require "notifiable/apns/apnotic/async"
 
 module Notifiable
   module Apns
     module Apnotic
-      # Your code goes here...
     end
   end
 end
