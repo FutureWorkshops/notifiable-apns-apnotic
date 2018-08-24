@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require 'notifiable'
+require "notifiable/apns/apnotic"
+require 'sqlite3'
+
+# setup dummy db connection
+require 'active_record'
+ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => 'db/development.sqlite3')
+
+ActiveRecord::Migration.verbose = false
+notifiable_rails_path = Gem.loaded_specs['notifiable-rails'].full_gem_path
+ActiveRecord::MigrationContext.new(File.join(notifiable_rails_path, 'db', 'migrate')).migrate
+
+require "irb"
+IRB.start(__FILE__)
