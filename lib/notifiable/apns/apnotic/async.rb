@@ -19,7 +19,7 @@ module Notifiable
           raise "certificate missing" if certificate.nil?
           raise "bundle_id missing" if bundle_id.nil?
           
-          connection = ::Apnotic::Connection.new(cert_path: certificate, cert_pass: passphrase, url: url)
+          connection = ::Apnotic::Connection.new(cert_path: StringIO.new(certificate), cert_pass: passphrase, url: url)
           
           apnotic_notification = build_notification(device, notification)
         
