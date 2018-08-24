@@ -1,15 +1,7 @@
 PATH
-  remote: ../notifiable-rails
-  specs:
-    notifiable-rails (0.29.0)
-      activerecord-postgis-adapter
-      pg
-      rails
-
-PATH
   remote: .
   specs:
-    notifiable-apns-apnotic (0.1.0)
+    notifiable-apns-apnotic (0.1.2)
       apnotic (~> 1.4.1)
       notifiable-rails (>= 0.29.0)
 
@@ -92,6 +84,10 @@ GEM
     nio4r (2.3.1)
     nokogiri (1.8.4)
       mini_portile2 (~> 2.3.0)
+    notifiable-rails (0.30.1)
+      activerecord-postgis-adapter
+      pg
+      rails
     pg (1.0.0)
     rack (2.0.5)
     rack-test (1.1.0)
@@ -160,7 +156,6 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.16)
   notifiable-apns-apnotic!
-  notifiable-rails!
   rake (~> 10.0)
   rspec (~> 3.0)
   sqlite3
