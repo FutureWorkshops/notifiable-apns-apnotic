@@ -1,11 +1,8 @@
 require "bundler/setup"
 require "notifiable/apns/apnotic"
 
-# Setup ActiveRecord
-ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => 'db/test.sqlite3')
-ActiveRecord::Migration.verbose = false
-notifiable_rails_path = Gem.loaded_specs['notifiable-rails'].full_gem_path
-ActiveRecord::MigrationContext.new(File.join(notifiable_rails_path, 'db', 'migrate')).migrate
+# Setup ActiveRecord db connection
+ActiveRecord::Base.establish_connection(YAML.load_file('config/database.yml')['test'])
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

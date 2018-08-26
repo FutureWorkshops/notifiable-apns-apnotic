@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Notifiable::Apns::Apnotic::Async do
 
-  subject { described_class.new(Rails.env, n1) }
+  subject { described_class.new(n1) }
   let(:a1) { Notifiable::App.create! name: "Drum Cussac" }
   let(:n1) { Notifiable::Notification.create! app: a1 }
   

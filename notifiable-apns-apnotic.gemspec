@@ -20,11 +20,12 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
   
-  spec.add_dependency "notifiable-rails", ">= 0.29.0"
+  spec.add_dependency "notifiable-core", ">= 0.1.3"
   spec.add_dependency 'apnotic', '~> 1.4.1'
 
   spec.add_development_dependency "bundler", "~> 1.16"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency "sqlite3"
+  spec.add_development_dependency "pg"
+
 end

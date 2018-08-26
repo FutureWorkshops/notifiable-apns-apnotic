@@ -26,7 +26,7 @@ module Notifiable
           push = connection.prepare_push(apnotic_notification)
           push.on(:response) do |response|
             if response.ok?
-              processed(device, 0)
+              processed(device)
             else
               processed(device, response.status, response.body['reason'])
               device.destroy if response.status == '410' || (response.status == '400' && response.body['reason'] == 'BadDeviceToken')
