@@ -1,5 +1,9 @@
 require "bundler/setup"
 require "notifiable/apns/apnotic"
+require "factory_bot"
+
+# Load support dir
+Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 # Setup ActiveRecord db connection
 ActiveRecord::Base.establish_connection(YAML.load_file('config/database.yml')['test'])
@@ -13,6 +17,9 @@ RSpec.configure do |config|
   
   # Remove the need for RSpec prefixes
   config.expose_dsl_globally = true
+  
+  # Remove need for factory girl prefix
+  config.include FactoryBot::Syntax::Methods
 
   config.expect_with :rspec do |c|
     c.syntax = :expect

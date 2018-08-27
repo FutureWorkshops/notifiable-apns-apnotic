@@ -18,9 +18,7 @@ module Notifiable
   			def enqueue(device, notification)        				
           raise "certificate missing" if certificate.nil?
           raise "bundle_id missing" if bundle_id.nil?
-          
-          connection = ::Apnotic::Connection.new(cert_path: StringIO.new(certificate), cert_pass: passphrase, url: url)
-          
+
           apnotic_notification = build_notification(device, notification)
         
           push = connection.prepare_push(apnotic_notification)
@@ -34,12 +32,6 @@ module Notifiable
           end
 
           connection.push_async(push)
-          
-          # wait for all requests to be completed
-          connection.join
-
-          # close the connection
-          connection.close
   			end
     
 
@@ -48,9 +40,20 @@ module Notifiable
           self.sandbox? ? ::Apnotic::APPLE_DEVELOPMENT_SERVER_URL : ::Apnotic::APPLE_PRODUCTION_SERVER_URL
         end
         
-        attr_accessor :alert, :badge, :sound, :content_available, :category, :custom_payload, :url_args, :mutable_content, :thread_id
+        def flush
+          @connection.join
+        end
         
-          
+        def close
+          super.close
+          connection.close
+          @connection = nil
+        end
+        
+        def connection
+          @connection ||= ::Apnotic::Connection.new(cert_path: StringIO.new(certificate), cert_pass: passphrase, url: url)
+        end
+                  
         def build_notification(device, notification)
           payload = ::Apnotic::Notification.new(device.token)
           payload.alert = {}

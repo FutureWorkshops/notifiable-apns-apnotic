@@ -11,4 +11,25 @@ describe Notifiable::Apns::Apnotic::Async do
     it { expect(subject.send(:sandbox?)).to eql true }
   end
   
+  describe "#enqueue" do
+    let(:app) { create(:app) }
+    let(:notification) { create(:notification) }
+    let(:connection) { instance_double(Apnotic::Connection) }
+    let(:push) { instance_double(Apnotic::Push) }
+    before(:each) do
+      allow(subject).to receive(:connection) { connection }
+      expect(connection).to receive(:prepare_push) { push }
+      expect(push).to receive(:on) { }
+      expect(connection).to receive(:push_async) { }
+      subject.bundle_id = "com.example.Example"
+      subject.certificate = File.open(File.join(File.dirname(__FILE__), "..", "..", "..", "fixtures", "apns-development.pem")).read
+      subject.send(:enqueue, device, notification)
+    end
+    
+    context 'normal device' do
+      let(:device) { create(:device_token, app: app, provider: :apns) }
+      it { expect(1).to eq 1 }
+    end
+  end
+  
 end
