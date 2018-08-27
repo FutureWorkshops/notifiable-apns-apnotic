@@ -41,11 +41,7 @@ module Notifiable
         end
         
         def flush
-          @connection.join
-        end
-        
-        def close
-          super.close
+          connection.join
           connection.close
           @connection = nil
         end
