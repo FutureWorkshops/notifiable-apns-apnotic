@@ -32,4 +32,44 @@ describe Notifiable::Apns::Apnotic::Async do
     end
   end
   
+  describe '#process_response' do
+    let(:device) { create(:device_token) }
+    context 'ok' do
+      let(:response) { instance_double(Apnotic::Response, 'ok?': true) }
+      before(:each) do
+        expect(subject).to receive(:processed).with(device)
+        subject.send(:process_response, response, device)
+      end 
+      it { expect(1).to eq 1 }   
+    end
+    
+    context '410' do
+      let(:response) { instance_double(Apnotic::Response, 'ok?': false, status: '410', body: {'reason' => 'NotFound'}) }
+      before(:each) do
+        expect(subject).to receive(:processed).with(device, '410', 'NotFound')
+        subject.send(:process_response, response, device)
+      end 
+      it { expect(device.destroyed?).to eq true }   
+    end
+    
+    
+    context '400 BadDeviceToken' do
+      let(:response) { instance_double(Apnotic::Response, 'ok?': false, status: '400', body: {'reason' => 'BadDeviceToken'}) }
+      before(:each) do
+        expect(subject).to receive(:processed).with(device, '400', 'BadDeviceToken')
+        subject.send(:process_response, response, device)
+      end 
+      it { expect(device.destroyed?).to eq true }   
+    end
+    
+    context '400 DeviceTokenNotForTopic' do
+      let(:response) { instance_double(Apnotic::Response, 'ok?': false, status: '400', body: {'reason' => 'DeviceTokenNotForTopic'}) }
+      before(:each) do
+        expect(subject).to receive(:processed).with(device, '400', 'DeviceTokenNotForTopic')
+        subject.send(:process_response, response, device)
+      end 
+      it { expect(device.destroyed?).to eq true }   
+    end
+  end
+  
 end

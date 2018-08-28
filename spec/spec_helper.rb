@@ -1,6 +1,8 @@
 require "bundler/setup"
 require "notifiable/apns/apnotic"
 require "factory_bot"
+require "byebug"
+require "database_cleaner"
 
 # Load support dir
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
@@ -23,5 +25,17 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+  
+  config.before(:all) {
+    DatabaseCleaner.strategy = :truncation
+  }
+
+  config.before(:each) do
+    DatabaseCleaner.start
+  end
+
+  config.after(:each) do
+    DatabaseCleaner.clean
   end
 end
