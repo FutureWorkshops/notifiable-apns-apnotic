@@ -1,5 +1,6 @@
 require 'notifiable'
 require 'apnotic'
+require 'grocer'
 
 module Notifiable
   module Apns
@@ -46,6 +47,7 @@ module Notifiable
           connection.join
           connection.close
           @connection = nil
+          process_feedback if ENV['APNS_APNOTIC_PROCESS_FEEDBACK_APP_IDS'].split(',').include?(notification.app.id)
         end
         
         def connection
@@ -70,6 +72,35 @@ module Notifiable
           payload.identifier = notification.identifier if notification.identifier
           
           payload
+        end
+        
+        def grocer_feedback
+  				@grocer_feedback ||= ::Grocer.feedback(feedback_config)
+        end
+        
+        def feedback_host
+          self.sandbox? ? "feedback.sandbox.push.apple.com" : "feedback.push.apple.com"
+        end
+        
+        def feedback_config
+          {
+            certificate: certificate,
+            passphrase:  passphrase,
+            gateway:     feedback_host,
+            port:        2196,
+            retries:     3
+          }
+        end
+    
+        def process_feedback
+  				grocer_feedback.each do |attempt|
+  					token = attempt.device_token
+  					device_token = DeviceToken.find_by_token(token)
+  					if device_token
+  						device_token.destroy if device_token.updated_at < attempt.timestamp
+  						logger.info("Device #{token} removed at #{attempt.timestamp}")
+  					end
+  				end
         end
   		end
     end
