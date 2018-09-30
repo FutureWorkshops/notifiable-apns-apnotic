@@ -47,7 +47,7 @@ module Notifiable
           connection.join
           connection.close
           @connection = nil
-          process_feedback if ENV['APNS_APNOTIC_PROCESS_FEEDBACK_APP_IDS'].split(',').include?(notification.app.id)
+          process_feedback if ENV['APNS_APNOTIC_PROCESS_FEEDBACK_APP_IDS'].split(',').include?(notification.app.id.to_s)
         end
         
         def connection
