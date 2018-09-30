@@ -1,8 +1,9 @@
 PATH
   remote: .
   specs:
-    notifiable-apns-apnotic (0.2.3)
+    notifiable-apns-apnotic (0.2.4)
       apnotic (~> 1.4.1)
+      grocer (~> 0.7.1)
       notifiable-core (>= 0.1.3)
 
 GEM
@@ -32,13 +33,14 @@ GEM
     diff-lcs (1.3)
     factory_bot (4.11.0)
       activesupport (>= 3.0.0)
+    grocer (0.7.1)
     http-2 (0.9.0)
     i18n (1.1.0)
       concurrent-ruby (~> 1.0)
     minitest (5.11.3)
     net-http2 (0.18.0)
       http-2 (= 0.9.0)
-    notifiable-core (0.1.4)
+    notifiable-core (0.2.0)
       activerecord
       activerecord-import
     pg (1.1.0)

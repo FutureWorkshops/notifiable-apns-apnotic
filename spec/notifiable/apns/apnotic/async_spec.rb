@@ -72,4 +72,10 @@ describe Notifiable::Apns::Apnotic::Async do
     end
   end
   
+  describe '#flush' do
+    let(:feedback) { double(:feedback, each: []) }
+    before(:each) { allow(subject).to receive(:grocer_feedback) { feedback } }
+    it { expect(subject.send(:process_feedback)).to eq [] }
+  end
+  
 end
