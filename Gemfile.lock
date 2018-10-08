@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    notifiable-apns-apnotic (0.3.2)
+    notifiable-apns-apnotic (0.3.3)
       apnotic (~> 1.4.1)
       grocer (~> 0.7.1)
       notifiable-core (>= 0.1.3)
