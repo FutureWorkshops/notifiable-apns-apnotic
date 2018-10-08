@@ -24,8 +24,7 @@ module Notifiable
           apnotic_enqueue(apnotic_notification, device)
           
         rescue SocketError => e
-          # create a new connection and retry
-          close_connection
+          # retry on socket error, see https://github.com/ostinelli/apnotic/issues/41#issue-203624698
           apnotic_enqueue(apnotic_notification, device)
   			end
     

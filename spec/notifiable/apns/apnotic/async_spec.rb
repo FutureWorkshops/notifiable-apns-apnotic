@@ -29,9 +29,6 @@ describe Notifiable::Apns::Apnotic::Async do
           @times_called += 1
           raise push_async_error if @times_called == 1
         end
-        
-        expect(connection).to receive(:join) {}
-        expect(connection).to receive(:close) {}
       else
         expect(connection).to receive(:prepare_push) { push }
         expect(push).to receive(:on) { }
