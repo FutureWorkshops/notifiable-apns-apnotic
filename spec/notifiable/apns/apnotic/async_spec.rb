@@ -2,9 +2,9 @@ require 'spec_helper'
 
 describe Notifiable::Apns::Apnotic::Async do
 
-  subject { described_class.new(n1) }
-  let(:a1) { Notifiable::App.create! name: "Drum Cussac" }
-  let(:n1) { Notifiable::Notification.create! app: a1 }
+  let(:app) { create(:app) }
+  let(:notification) { create(:notification) }
+  subject { described_class.new(notification) }
   
   describe "#sandbox?" do
     before(:each) { subject.instance_variable_set("@sandbox", "1") }
@@ -12,8 +12,6 @@ describe Notifiable::Apns::Apnotic::Async do
   end
   
   describe "#enqueue" do
-    let(:app) { create(:app) }
-    let(:notification) { create(:notification) }
     let(:connection) { instance_double(Apnotic::Connection) }
     let(:push) { instance_double(Apnotic::Push) }
     before(:each) do
