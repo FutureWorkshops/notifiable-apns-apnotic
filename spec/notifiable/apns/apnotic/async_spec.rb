@@ -14,18 +14,41 @@ describe Notifiable::Apns::Apnotic::Async do
   describe "#enqueue" do
     let(:connection) { instance_double(Apnotic::Connection) }
     let(:push) { instance_double(Apnotic::Push) }
+    let(:push_async_error) { nil }
+    let(:device) { create(:device_token, app: app, provider: :apns) }
+    
     before(:each) do
       allow(subject).to receive(:connection) { connection }
-      expect(connection).to receive(:prepare_push) { push }
-      expect(push).to receive(:on) { }
-      expect(connection).to receive(:push_async) { }
+
+      if(push_async_error)
+        expect(connection).to receive(:prepare_push).twice { push }
+        expect(push).to receive(:on).twice { }
+        
+        @times_called = 0
+        allow(connection).to receive(:push_async) do
+          @times_called += 1
+          raise push_async_error if @times_called == 1
+        end
+        
+        expect(connection).to receive(:join) {}
+        expect(connection).to receive(:close) {}
+      else
+        expect(connection).to receive(:prepare_push) { push }
+        expect(push).to receive(:on) { }
+        expect(connection).to receive(:push_async) { }
+      end
+      
       subject.bundle_id = "com.example.Example"
       subject.certificate = File.open(File.join(File.dirname(__FILE__), "..", "..", "..", "fixtures", "apns-development.pem")).read
       subject.send(:enqueue, device, notification)
     end
     
     context 'normal device' do
-      let(:device) { create(:device_token, app: app, provider: :apns) }
+      it { expect(1).to eq 1 }
+    end
+    
+    context 'connection error' do
+      let(:push_async_error) { SocketError.new('Socket was remotely closed') }
       it { expect(1).to eq 1 }
     end
   end

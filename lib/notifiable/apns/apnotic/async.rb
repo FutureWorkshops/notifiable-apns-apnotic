@@ -21,15 +21,22 @@ module Notifiable
           raise "bundle_id missing" if bundle_id.nil?
 
           apnotic_notification = build_notification(device, notification)
-        
-          push = connection.prepare_push(apnotic_notification)
-          push.on(:response) {|response| process_response(response, device) }
-
-          connection.push_async(push)
+          apnotic_enqueue(apnotic_notification, device)
+          
+        rescue SocketError => e
+          # create a new connection and retry
+          close_connection
+          apnotic_enqueue(apnotic_notification, device)
   			end
     
 
         private 
+        def apnotic_enqueue(apnotic_notification, device)
+          push = connection.prepare_push(apnotic_notification)
+          push.on(:response) {|response| process_response(response, device) }
+          connection.push_async(push)
+        end
+        
         def url
           self.sandbox? ? ::Apnotic::APPLE_DEVELOPMENT_SERVER_URL : ::Apnotic::APPLE_PRODUCTION_SERVER_URL
         end
@@ -43,10 +50,14 @@ module Notifiable
           end
         end
         
-        def flush
+        def close_connection
           connection.join
           connection.close
-          @connection = nil
+          @connection = nil          
+        end
+        
+        def flush
+          close_connection
           process_feedback
         end
         
