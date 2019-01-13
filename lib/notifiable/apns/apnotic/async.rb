@@ -75,7 +75,7 @@ module Notifiable
           payload.badge = notification.badge_count if notification.badge_count          
           payload.custom_payload = notification.send_params
           payload.thread_id = notification.thread_id if notification.thread_id
-          payload.mutable_content = notification.mutable_content if notification.mutable_content 
+          payload.mutable_content = (notification.mutable_content if notification.mutable_content) || notification.app.save_notification_statuses
           payload.category = notification.category if notification.category
           payload.topic = bundle_id
           payload.expiration = 0 || notification.expiry.to_f

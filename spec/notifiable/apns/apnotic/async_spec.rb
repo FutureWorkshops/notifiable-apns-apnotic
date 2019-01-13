@@ -3,7 +3,8 @@ require 'spec_helper'
 describe Notifiable::Apns::Apnotic::Async do
 
   let(:app) { create(:app) }
-  let(:notification) { create(:notification) }
+  let(:notification) { create(:notification, app: app) }
+  let(:device) { create(:device_token, app: app, provider: :apns) }
   subject { described_class.new(notification) }
   
   describe "#sandbox?" do
@@ -15,7 +16,6 @@ describe Notifiable::Apns::Apnotic::Async do
     let(:connection) { instance_double(Apnotic::Connection) }
     let(:push) { instance_double(Apnotic::Push) }
     let(:push_async_error) { nil }
-    let(:device) { create(:device_token, app: app, provider: :apns) }
     
     before(:each) do
       allow(subject).to receive(:connection) { connection }
@@ -47,6 +47,19 @@ describe Notifiable::Apns::Apnotic::Async do
     context 'connection error' do
       let(:push_async_error) { SocketError.new('Socket was remotely closed') }
       it { expect(1).to eq 1 }
+    end
+  end
+  
+  describe '#build_notification' do    
+    before(:each) { @payload = subject.send(:build_notification, device, notification) }
+    context 'app save_delivery_statuses is true' do
+      let(:app) { create(:app, configuration: { save_notification_statuses: true }) }
+      it { expect(@payload.mutable_content).to eq true }
+    end
+    
+    context 'app save_delivery_statuses is false' do
+      let(:app) { create(:app, configuration: { save_notification_statuses: false }) }
+      it { expect(@payload.mutable_content).to eq false }
     end
   end
   
