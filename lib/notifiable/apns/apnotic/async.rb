@@ -23,7 +23,7 @@ module Notifiable
           apnotic_notification = build_notification(device, notification)
           apnotic_enqueue(apnotic_notification, device)
           
-        rescue SocketError => e
+        rescue SocketError, Errno::ECONNRESET => e
           # retry on socket error, see https://github.com/ostinelli/apnotic/issues/41#issue-203624698
           apnotic_enqueue(apnotic_notification, device)
   			end
