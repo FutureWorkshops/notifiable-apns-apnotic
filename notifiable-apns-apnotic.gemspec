@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   
   spec.add_dependency "notifiable-core", ">= 0.1.3"
-  spec.add_dependency 'apnotic', '~> 1.4.1'
+  spec.add_dependency 'apnotic', '~> 1.6.0'
   spec.add_dependency 'grocer', '~> 0.7.1'
 
   spec.add_development_dependency "bundler", "~> 1.16"
