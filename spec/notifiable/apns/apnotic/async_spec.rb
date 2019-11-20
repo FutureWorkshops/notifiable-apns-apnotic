@@ -61,6 +61,12 @@ describe Notifiable::Apns::Apnotic::Async do
       let(:app) { create(:app, configuration: { save_notification_statuses: false }) }
       it { expect(@payload.mutable_content).to eq false }
     end
+    
+    context 'infer priority' do
+      let(:notification) { create(:notification, app: app, content_available: true) }
+      
+      it { expect(@payload.priority).to eq 5 }
+    end
   end
   
   describe '#process_response' do
