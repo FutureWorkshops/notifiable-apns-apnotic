@@ -69,10 +69,10 @@ module Notifiable
           payload.alert = {}
           payload.alert[:title] = notification.title if notification.title
           payload.alert[:body] = notification.message if notification.message
-          payload.sound = notification.sound || 'default'
           payload.category = notification.category if notification.category
           payload.content_available = notification.content_available if notification.content_available
           payload.priority = 5  if notification.content_available # infer valid priority if content_avalible flag is true
+          payload.sound = notification.sound || notification.content_available ? nil : 'default'
           payload.badge = notification.badge_count if notification.badge_count          
           payload.custom_payload = notification.send_params
           payload.thread_id = notification.thread_id if notification.thread_id

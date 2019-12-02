@@ -62,10 +62,15 @@ describe Notifiable::Apns::Apnotic::Async do
       it { expect(@payload.mutable_content).to eq false }
     end
     
-    context 'infer priority' do
+    context 'default sound' do
+      let(:notification) { create(:notification, app: app, title: 'New offers') }
+      it { expect(@payload.sound).to eq 'default' }
+    end
+    
+    context 'infer priority and sound' do
       let(:notification) { create(:notification, app: app, content_available: true) }
-      
       it { expect(@payload.priority).to eq 5 }
+      it { expect(@payload.sound).to eq nil }
     end
   end
   
